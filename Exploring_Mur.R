@@ -24,3 +24,10 @@ murders %>%
 
 murders[is.na(murders$total)]
 
+murders %>% 
+  select(everything()) %>% 
+  filter(!complete.cases(.))
+
+murders %>% 
+  distinct()
+
