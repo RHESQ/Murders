@@ -11,6 +11,7 @@ setwd("C:/Users/KELVIN/Desktop/Analytics/Murders")
 
 library(dslabs)
 library(tidyverse)
+library(statip)
 
 data("murders")
 
@@ -36,3 +37,14 @@ murders %>%
   mutate(status = if_else(total > 50,
                           "not safe", "safe"))
 
+murders %>% 
+  group_by(region) %>% 
+  summarise(Average = mean(total),
+            upper = max(total),
+            lower = min(total),
+            Median = median(total),
+            Mode = mfv(total),
+            iqr = IQR(total)) %>% 
+  arrange(Average) %>% 
+  view()
+  
