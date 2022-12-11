@@ -31,3 +31,8 @@ murders %>%
 murders %>% 
   distinct()
 
+murders %>% 
+  select(everything()) %>% 
+  mutate(status = if_else(total > 50,
+                          "not safe", "safe"))
+
