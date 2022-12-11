@@ -18,5 +18,9 @@ glimpse(murders)
 view(murders)
 
 murders %>% 
-  select(everything) %>% 
-  arrange()
+  select(everything()) %>% 
+  arrange(-total) %>% 
+  view()
+
+murders[is.na(murders$total)]
+
