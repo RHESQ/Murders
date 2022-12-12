@@ -4,7 +4,7 @@
 #          Finding out what we can get from the data
 #          what kind of Data do we have
 #          is the data clean
-#          add, changing and removing features to get more from the data
+#          adding, changing and removing features to get more from the data
 
 getwd()
 setwd("C:/Users/KELVIN/Desktop/Analytics/Murders")
@@ -13,6 +13,7 @@ library(dslabs)
 library(tidyverse)
 library(statip)
 library(ggthemes)
+library(ggrepel)
 
 data("murders")
 
@@ -36,7 +37,8 @@ murders %>%
 murders %>% 
   select(everything()) %>% 
   mutate(status = if_else(total > 50,
-                          "not safe", "safe"))
+                          "not safe", "safe"),
+         rate = total / population * 10^6)
 
 murders %>% 
   group_by(region) %>% 
@@ -52,7 +54,7 @@ murders %>%
 ## 1. Data component
       
 ## 2. Geometric component
-      #boxplot, scatter plot
+      #boxplot, scatter plot, smooth density
 
 ## 3. aesthetics mapping
       # 
@@ -66,7 +68,7 @@ murders %>%
 
 
 rate <- murders %>% 
-  sumarise(rate = sum(total) / sum(poplation) * 10^6) %>% 
+  summarise(rate = sum(total) / sum(population) * 10^6) %>% 
   .$rate
 
 
@@ -76,45 +78,56 @@ region_rate <- murders %>%
   summarise(region_rate = sum(total) / sum(population) * 10^6) %>% 
   .$region_rate
 
-region_rate
 
-S_r <- murders %>% 
-  select(everything()) %>% 
-  filter(region %in% "South") %>% 
-  summarise(S_r = sum(total) / sum(population) * 10^6) %>% 
-  .$S_r
-S_r
-
-NC_r <- murders %>% 
-  select(everything()) %>% 
-  filter(region %in% "North Central") 
-  summarise(NC_r = sum(total) / sum(population) * 10^6) %>% 
-  .$Nc_r
-NC_r
-
-W_r <- murders %>% 
-  select(everything()) %>% 
-  filter(region %in% "West") %>% 
-  summarise(W_r = sum(total) / sum(population) * 10^6) %>% 
-  .$W_r
-W_r
 
 murders %>% 
-  ggplot(aes(region, total, col = region)) +
-  geom_boxplot() +
+  ggplot(aes(x = reorder(region, total, FUN = median), total)) +
+  geom_boxplot(aes(col = region)) +
+  geom_jitter() +
   
   geom_hline(yintercept = (region_rate), 
              linetype = "dashed", color = "darkgrey") +
   
   
   scale_y_log10() +
+  
+  ylab("Total count of Murder") +
+  xlab("Region of States") +
+  ggtitle("Distribution of Murders in the U. S") +
+  
+  theme_economist() +
   theme(
     panel.grid = element_blank(),
-    plot.title = element_text(hjust = 0.5)
-    ) +
-  xlab("Total count of Murder") +
-  ylab("Region of States") +
+    plot.title = element_text(hjust = 0.5),
+    
+    panel.grid.major.y = element_line(colour = "white", size = 1)
+  )
+
+
+
+murders %>% 
+  ggplot(aes(population / 10^6, total, label = abb)) + 
+  geom_point(aes(col = region)) +
+  geom_text_repel() +
+  
+  scale_x_log10() +
+  scale_y_log10() +
+  
+  xlab("Population of states(log10)") +
+  ylab("Total count of Murders(log10)") +
   ggtitle("Distribution of Murders in the U. S") +
-  theme_economist()
+  
+  theme_economist() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    panel.grid = element_blank(),
+    
+    panel.grid.major.y = element_line(color = "white", size = 1)
+  )
+
+
+
+murders %>% 
+  gplots()
 
 
