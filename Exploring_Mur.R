@@ -140,3 +140,7 @@ set.seed(1234)
 
 library(caTools)
 split <- sample.split(murders, splitRatio = 0.7)
+split
+
+train <- subset(murders, split = "TRUE")
+test <- subset(murders, split = "FALSE")
