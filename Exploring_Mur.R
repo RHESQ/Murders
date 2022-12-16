@@ -1,4 +1,4 @@
-###### Exporing the Murders Dataset ######
+###### Exploring the Murders Dataset ######
 ### Date : 12 / 12 / 2022
 ### Goals :
 #          Finding out what we can get from the data
@@ -49,6 +49,13 @@ murders %>%
             Mode = mfv(total),
             iqr = IQR(total)) %>% 
   arrange(Average) %>% 
+  view()
+
+summary(murders)
+
+murders %>% 
+  select(region, population, total) %>% 
+  summary(murders) %>% 
   view()
 
 ## 1. Data component
@@ -127,7 +134,9 @@ murders %>%
 
 
 
-murders %>% 
-  gplots()
+###### Splitting the data into training and test data ######
 
+set.seed(1234)
 
+library(caTools)
+split <- sample.split(murders, splitRatio = 0.7)
