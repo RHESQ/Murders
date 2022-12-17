@@ -54,9 +54,14 @@ murders %>%
 summary(murders)
 
 murders %>% 
-  select(region, population, total) %>% 
+  select(region, total) %>% 
   summary(murders) %>% 
   view()
+
+murders %>% 
+  select(region, total) %>% 
+  summary(murders) %>% 
+  arrange()
 
 ## 1. Data component
       
@@ -86,9 +91,8 @@ region_rate <- murders %>%
   .$region_rate
 
 
-
 murders %>% 
-  ggplot(aes(x = reorder(region, total, FUN = median), total)) +
+  ggplot(aes(x = reorder(region, total, FUN = mean), total)) +
   geom_boxplot(aes(col = region)) +
   geom_jitter() +
   
@@ -133,14 +137,33 @@ murders %>%
   )
 
 
+#take a look at the distribution values by mean  
+murders %>% 
+  select(region, total) %>% 
+  group_by(region) %>% 
+  summarise(mean_murder = mean(total),
+            median_murder = median(total)) %>% 
+  arrange(median_murder) %>% view()
 
-###### Splitting the data into training and test data ######
+# Research question:    Is the overall total murder in
+#                       these four regions of the states
+#                       different
 
-set.seed(1234)
+# Hypothesis testing:   H0: Mean total murder is the same
+#                       H1: Mean total murder is not the same
 
-library(caTools)
-split <- sample.split(murders, splitRatio = 0.7)
-split
+# Observation:          Difference in mean is observed in the
+#                       sample data, but is this statistically
+#                       significant (alpha = 0.05)
 
-train <- subset(murders, split = "TRUE")
-test <- subset(murders, split = "FALSE")
+# Anova model
+
+murders %>% 
+  select(region, total) %>% 
+  aov(total ~ region, data = .) %>% 
+  summary()
+
+murders %>% 
+  select(region, total) %>% 
+  aov(total ~ region, data = .) %>% 
+  TukeyHSD()
